@@ -5,100 +5,61 @@ import java.util.List;
 
 public class App {
 
-    private static List<Integer> sols;
-
     public static void main(String[] args) {
-        int num1 = 9; int num2 = 12;
-        sols = new ArrayList<Integer>();
+        int num1 = 153; int num2 = 256;
 
-        // --------------------------------------
+        int s = 255;
 
-        sols.add(0);
-        sols.add(num1);
-        sols.add(num2);
+        Jug j1 = new Jug("JugOne", num1);
+        Jug j2 = new Jug("JugTwo", num2);
 
-        List<Integer> keyNums = getKeyNums(num1, num2);
+        if (isSolution(s, num1, num2)) {
+            List<String> steps = getSolution(s, j1, j2);
+            for (String step : steps) {
+                System.out.println(step);
+            }
+        } else {
+            System.out.println("no solution");
+        }
+    }
 
-        for (Integer num : keyNums) {
-            for (int i = (num2 - num); i > 0; i -= num1) {
-                if (!sols.contains(i)) {
-                    sols.add(i);
+    public static List<String> getSolution(int sol, Jug j1, Jug j2) {
+        List<String> steps = new ArrayList<String>();
+        if (sol == 0) {
+            steps.add("JUST EMPTY ANY JUG");
+        }
+        
+        while (true) {
+            steps.add(j2.fill());
+            if (j2.getWater() == sol) return steps;
+
+            while (j2.getWater() != 0) {
+
+                steps.add(j2.pour_into(j1));
+                if ((j1.getWater() == sol) || (j2.getWater() == sol)) return steps;
+                
+                if (j1.getSpace() == 0) {
+                    steps.add(j1.empty());
                 }
             }
         }
-
-        sols.sort((e1, e2) -> {
-            return e1 - e2;
-        });
     }
 
-    public static List<Integer> getKeyNums(int num1, int num2) {
-        List<Integer> keyNums = new ArrayList<Integer>();
-        int k = num1;
-        while(true) {
-
-            if (!keyNums.contains(k)) {
-                keyNums.add(k);
-            } else {
-                return keyNums;
-            }
-
-            k = num1 - ((num2 - k) % num1);
+    public static boolean isSolution(int sol, int num1, int num2) {
+        if (sol == 0) {
+            return true;
+        } else {
+            return ((sol % getGCD(num1, num2)) == 0);
         }
     }
 
-    public class Jug {
-
-        private String name;
-
-        private int water;
-        private int capacity;
-
-        public Jug(String name, int capacity) {
-            this.name = name;
-            this.capacity = capacity;
-            fill();
+    public static int getGCD(int num1, int num2) {
+        while (num1 != num2) {
+        	if(num1 > num2)
+                num1 = num1 - num2;
+            else
+                num2 = num2 - num1;
         }
-
-        public String fill() {
-            this.water = this.capacity;
-            return "Fill " + this.name;
-        }
-
-        public String empty() {
-            this.water = 0;
-            return "Empty " + this.name;
-        }
-
-        public String pour_into(Jug other) {
-            if (other.getSpace() > this.water) {
-                other.addWater(this.water);
-                this.empty();
-            } else { 
-                this.water -= other.getSpace();
-                other.fill();
-            }
-            return "Pour " + this.name + "into" + other.getName();
-        }
-
-        private void addWater(int water) {
-            if (water < 0) {
-                throw new Error("Encountered negative water");
-            }
-            int temp = this.water + water;
-            this.water = (temp > this.capacity) ? this.capacity : temp;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public int getWater() {
-            return this.water;
-        }
-
-        public int getSpace() {
-            return this.capacity - this.water;
-        }
+        return num2;
     }
 }
