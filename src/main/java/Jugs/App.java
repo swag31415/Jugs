@@ -1,23 +1,32 @@
 package Jugs;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class App {
 
     public static void main(String[] args) {
-        int num1 = 153; int num2 = 256;
+        int[] jug_sizes = {4, 8, 21};
 
-        int s = 255;
+        int s = 5;
 
-        Jug j1 = new Jug("JugOne", num1);
-        Jug j2 = new Jug("JugTwo", num2);
+        // ----------------------------------------------------------------------------
 
-        if (isSolution(s, num1, num2)) {
-            List<String> steps = getSolution(s, j1, j2);
-            for (String step : steps) {
-                System.out.println(step);
-            }
+        Arrays.sort(jug_sizes);
+
+        List<Jug> jugs = new ArrayList<Jug>();
+        for (Integer size : jug_sizes) {
+            jugs.add(new Jug(size + "Jug", size));
+        }
+
+        if (isSolution(s, jug_sizes[0], Arrays.copyOfRange(jug_sizes, 1, jug_sizes.length))) {
+            // List<String> steps = getSolution(s, j1, j2);
+            // for (String step : steps) {
+            //     System.out.println(step);
+            // }
+            System.out.println("solution exists");
         } else {
             System.out.println("no solution");
         }
@@ -45,12 +54,30 @@ public class App {
         }
     }
 
-    public static boolean isSolution(int sol, int num1, int num2) {
+    public static boolean isSolution(int sol, int num1, int... nums) {
         if (sol == 0) {
             return true;
         } else {
-            return ((sol % getGCD(num1, num2)) == 0);
+            return ((sol % getGCD(num1, nums)) == 0);
         }
+    }
+
+    public static int getGCD(int num1, int... nums) {
+        int gcd = num1;
+
+        if (nums == null) {
+            return gcd;
+        }
+
+        int len = Array.getLength(nums);
+        for (int i = 0; i < len; i++) {
+            gcd = getGCD(gcd, nums[i]);
+            if (gcd == 1) {
+                return gcd;
+            }
+        }
+
+        return gcd;
     }
 
     public static int getGCD(int num1, int num2) {
