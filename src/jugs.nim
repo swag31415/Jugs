@@ -1,6 +1,7 @@
 ## Jugs
 
 import strutils
+import searchutils
 
 # Prompt the user and get positive non-zero integer input
 proc get_num(prompt: string): uint =
@@ -19,25 +20,9 @@ for i in 1..jug_count:
   jug_sizes.add(get_num("How big is jug " & $i & "?"))
 let target = get_num("What is the target amount?")
 
-var path: seq[uint]
-var log: seq[int]
+let search_log = search(jug_sizes, target)
 
-block search:
-  path.add(0)
-  var i = 0
-  while i < path.len():
-    for size in jug_sizes:
-      if not path.contains(path[i] + size):
-        path.add(path[i] + size)
-        log.add(i)
-        if path[i] + size == target: break search
-      if size < path[i] and not path.contains(path[i] - size):
-        path.add(path[i] - size)
-        log.add(i)
-        if path[i] - size == target: break search
-    inc(i)
-
-var i = log.len
+var i = search_log.src_inds.len
 while i > 0:
-  echo path[i]
-  i = log[i - 1]
+  echo search_log.nums[i]
+  i = search_log.src_inds[i - 1]
